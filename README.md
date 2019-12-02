@@ -18,43 +18,31 @@ _or_
 
 ## Api
 
-1. **`createStore(initialState, actionsCreators, enableLogger)`**: of course, to create the app's root Store! 😗
-   - **initialState**: vanilla or immutable js object, contains store default value.
-   - **actionsCreators**: js object contains function to update store value
-   - **enableLogger**: boolean flag for debugging
-2. **`<Provider />`**: wrap the root Component.
-   - The root component usually is `<App />` Component
-3. **`connect(mapStateToProps)(Component)`**: connect React Component to Store, very easy to get value from store in any components.
-   - **mapStateToProps**: a function to define which store values you want to inject into Component props
-4. **`dispatch(actionType, params)`**: dispatch an event to update the Store value, from everywhere.
-   - **actionType**: a string corresponding to the action name in `actionsCreators`
-   - **params**: should be an object contains the value you want to update in 
+_“Everything should be made as simple as possible, but no simpler.”_ - Einstein
 
-### Important and _funny_ part:
+```js
+const { Provider, Context, dispatch } = createStore(
+  initialState,
+  actionsCreators,
+  enableLogger
+);
+```
 
-You don't need to create action types anymore, all action type would be generated automatically. For example:
-
-- the actions creators:
-
-        const actionsCreators = {
-            addTodoItem: (state, { item }) => ({
-                list: state.list.push(item)
-            })
-        };
-
-- change the action name from camel case into screaming snake case (`addTodoItem` => `ADD_TODO_ITEM`) then dispatch action.
-
-        dispatch("ADD_TODO_ITEM", { item: item })
+- **initialState**: vanilla or immutable js object, contains store default value.
+- **actionsCreators**: js object contains function to update store value
+- **enableLogger**: boolean flag to enable logging for debug
+- **`<Provider />`**: wrap the root Component. The root component usually is `<App />` Component
+- **`dispatch(actionType, params)`**: dispatch an event to update the Store value, from everywhere.
+  - **actionType**: a string corresponding to the action name in `actionsCreators`
+  - **params**: should be an object contains the changes you want to update in store
 
 ## Example
 
-There are some examples app you can play with:
+There are some examples you can play with:
 
-- Web App Todos: [Todo App Example](https://github.com/minhtc/react-recontext/tree/master/examples/webapp)
-- Web App Todos Preview on CodeSandbox: [Todo App Example](https://codesandbox.io/s/github/GantMan/ReactStateMuseum/tree/master/React/react-recontext)
+- Todo Example React Web: [![Edit react-recontext-todo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/weathered-dew-dr4x6?fontsize=14&hidenavigation=1&theme=dark)
+- Todo Example React Native: [Todo App Example](https://snack.expo.io/@minhtc/react-recontext-demo)
 - Web App Hackathon Team Matcher: [Hackathon team matcher](https://junctionxhanoi.meohack.com)
-- React Native App Todos: [Todo App Example](https://github.com/minhtc/react-recontext/tree/master/examples/nativeapp)
-- React Native Todos Preview on Expo: [Todo App Example](https://snack.expo.io/@minhtc/react-recontext-demo)
 - React Native Audiobook: [Audiobook React Native App](https://github.com/minhtc/sachnoiapp)
 - ...more is coming...
 
@@ -67,7 +55,7 @@ Only **3 steps** to start with react-recontext
 ```js
 import createContext from "react-recontext";
 
-const { dispatch, Context, Provider } = createContext({
+export const { dispatch, Context, Provider } = createContext({
   displayName: "AppContext",
   initState: {
     todos: []
@@ -78,12 +66,8 @@ const { dispatch, Context, Provider } = createContext({
         todo.id === todoId ? { ...todo, completed: !todo.completed } : todo
       )
     })
-  },
-  isEnableLog: __DEV__
+  }
 });
-
-// export store
-export { dispatch, Context, Provider };
 ```
 
 2.  Wrap root component with Provider
@@ -120,7 +104,7 @@ const App = () => (
 );
 ```
 
-3.  Connect component to get data and call action anywhere you want
+3. Get data from store inside component by using React.useContext, and dispatch an action from anywhere you want
 
 ```js
 import React from "react";
@@ -136,7 +120,7 @@ const TodoList = () => {
         <Todo
           key={todo.id}
           todo={todo}
-          onClick={() => dispatch("TOGGLE_ITEM", { todoId: todo.id })} // dispatch action type to update store value
+          onClick={() => dispatch("TOGGLE_ITEM", { todoId: todo.id })}
         />
       ))}
     </ul>
